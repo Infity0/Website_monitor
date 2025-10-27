@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Добавить сайт - SiteMonitor{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="form-card">
+            <div class="card-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="header-text">
+                        <h2 class="card-title">Добавить сайт для мониторинга</h2>
+                        <p class="card-subtitle">Настройте отслеживание доступности вашего веб-сайта</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form method="POST" class="site-form">
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-info-circle me-2"></i>Основная информация
+                        </h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name" class="form-label">
+                                        <i class="fas fa-tag me-1"></i>Название сайта *
+                                    </label>
+                                    <input type="text" class="form-control custom-input" id="name" name="name" required
+                                           placeholder="Например: Google Главная страница">
+                                    <div class="form-hint">
+                                        Укажите понятное название для идентификации
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="check_interval" class="form-label">
+                                        <i class="fas fa-clock me-1"></i>Интервал проверки *
+                                    </label>
+                                    <select class="form-select custom-select" id="check_interval" name="check_interval" required>
+                                        <option value="1">1 минута</option>
+                                        <option value="2">2 минуты</option>
+                                        <option value="5" selected>5 минут</option>
+                                        <option value="10">10 минут</option>
+                                        <option value="15">15 минут</option>
+                                        <option value="30">30 минут</option>
+                                        <option value="60">1 час</option>
+                                    </select>
+                                    <div class="form-hint">
+                                        Как часто проверять доступность сайта
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h5 class="section-title">
+                            <i class="fas fa-link me-2"></i>Адрес сайта
+                        </h5>
+
+                        <div class="form-group">
+                            <label for="url" class="form-label">
+                                <i class="fas fa-globe me-1"></i>URL сайта *
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-link"></i>
+                                </span>
+                                <input type="url" class="form-control custom-input" id="url" name="url" required
+                                       placeholder="https://www.example.com">
+                            </div>
+                            <div class="form-hint">
+                                Укажите полный URL с http:// или https://. Пример: https://www.google.com
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- КНОПКИ ДЕЙСТВИЙ - ЯРКИЕ И КОНТРАСТНЫЕ -->
+                    <div class="form-actions-container">
+                        <div class="action-buttons-wrapper">
+                            <button type="submit" class="btn btn-primary btn-action-main">
+                                <i class="fas fa-plus-circle me-2"></i>Добавить сайт
+                            </button>
+                            <a href="{{ url_for('list_websites') }}" class="btn btn-secondary btn-action-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Вернуться к списку
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="info-card mt-4">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-lightbulb me-2"></i>Рекомендации по настройке
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="tip-item">
+                            <div class="tip-icon success">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h6>Значимые названия</h6>
+                                <p>Используйте понятные названия для легкой идентификации сайтов</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="tip-item">
+                            <div class="tip-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h6>Доступность URL</h6>
+                                <p>Убедитесь, что URL доступен из внешней сети</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="tip-item">
+                            <div class="tip-icon info">
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h6>Выбор интервала</h6>
+                                <p>Выбирайте интервал в зависимости от важности сайта</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="tip-item">
+                            <div class="tip-icon danger">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="tip-content">
+                                <h6>Нагрузка</h6>
+                                <p>Частые проверки могут увеличить нагрузку на сайт</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.form-actions-container {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e9ecef;
+    text-align: center;
+    background: #f8f9fa;
+    margin-left: -2rem;
+    margin-right: -2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    padding-bottom: 2rem;
+    border-radius: 0 0 15px 15px;
+}
+
+.action-buttons-wrapper {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* ЯРКАЯ СИНЯЯ КНОПКА */
+.btn-action-main {
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 12px;
+    width: 100%;
+    background: linear-gradient(135deg, #4361ee, #3a0ca3);
+    border: none;
+    box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-action-main:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(67, 97, 238, 0.6);
+    background: linear-gradient(135deg, #3a56d4, #280a7a);
+    color: white;
+}
+
+/* ТЕМНО-СЕРАЯ КНОПКА */
+.btn-action-secondary {
+    padding: 0.9rem 1.8rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 10px;
+    width: 100%;
+    background: linear-gradient(135deg, #6c757d, #495057);
+    border: none;
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    color: white;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-action-secondary:hover {
+    background: linear-gradient(135deg, #5a6268, #343a40);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(108, 117, 125, 0.4);
+    color: white;
+}
+
+/* Адаптивность для мобильных */
+@media (max-width: 768px) {
+    .form-actions-container {
+        margin-left: -1.5rem;
+        margin-right: -1.5rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .action-buttons-wrapper {
+        max-width: 100%;
+    }
+
+    .btn-action-main {
+        padding: 0.9rem 1.5rem;
+        font-size: 1.1rem;
+    }
+
+    .btn-action-secondary {
+        padding: 0.8rem 1.5rem;
+    }
+}
+</style>
+{% endblock %}

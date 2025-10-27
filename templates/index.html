@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Список сайтов - SiteMonitor{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-title">Управление сайтами</h1>
+            <p class="page-subtitle">Все отслеживаемые веб-сайты и их статус</p>
+        </div>
+        <a href="{{ url_for('add_website') }}" class="btn btn-primary btn-add">
+            <i class="fas fa-plus-circle me-2"></i>Добавить сайт
+        </a>
+    </div>
+</div>
+
+<div class="websites-table-container">
+    <div class="table-responsive">
+        <table class="table custom-table">
+            <thead>
+                <tr>
+                    <th class="name-col">Название</th>
+                    <th class="url-col">URL</th>
+                    <th class="status-col">Статус</th>
+                    <th class="interval-col">Интервал</th>
+                    <th class="last-check-col">Последняя проверка</th>
+                    <th class="actions-col">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for website in websites %}
+                <tr class="website-row {% if not website.is_active %}inactive{% endif %}">
+                    <td class="name-col">
+                        <div class="website-name-cell">
+                            <i class="fas fa-globe me-2"></i>
+                            {{ website.name }}
+                        </div>
+                    </td>
+                    <td class="url-col">
+                        <a href="{{ website.url }}" target="_blank" class="website-url">
+                            {{ website.url }}
+                            <i class="fas fa-external-link-alt ms-1"></i>
+                        </a>
+                    </td>
+                    <td class="status-col">
+                        <div class="status-indicators">
+                            <span class="badge monitoring-status {% if website.is_active %}active{% else %}paused{% endif %}">
+                                <i class="fas {% if website.is_active %}fa-play{% else %}fa-pause{% endif %} me-1"></i>
+                                {% if website.is_active %}Активен{% else %}Приостановлен{% endif %}
+                            </span>
+                            {% set last_check = website.checks|sort(attribute='checked_at', reverse=true)|first %}
+                            {% if last_check %}
+                            <span class="badge site-status {% if last_check.is_up %}online{% else %}offline{% endif %}">
+                                <i class="fas {% if last_check.is_up %}fa-check{% else %}fa-times{% endif %} me-1"></i>
+                                {% if last_check.is_up %}ONLINE{% else %}OFFLINE{% endif %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="interval-col">
+                        <span class="interval-badge">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ website.check_interval }} мин.
+                        </span>
+                    </td>
+                    <td class="last-check-col">
+                        {% set last_check = website.checks|sort(attribute='checked_at', reverse=true)|first %}
+                        {% if last_check %}
+                            <div class="last-check-info">
+                                <div class="check-time">
+                                    {{ last_check.get_local_time().strftime('%H:%M:%S') }}
+                                </div>
+                                <div class="check-date">
+                                    {{ last_check.get_local_time().strftime('%d.%m.%Y') }}
+                                </div>
+                            </div>
+                        {% else %}
+                            <span class="no-data">Нет данных</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-col">
+                        <div class="action-buttons">
+                            <button class="btn btn-action btn-toggle {% if website.is_active %}active{% else %}inactive{% endif %}" 
+                                    data-website-id="{{ website.id }}"
+                                    data-bs-toggle="tooltip"
+                                    title="{% if website.is_active %}Приостановить{% else %}Возобновить{% endif %} мониторинг">
+                                <i class="fas {% if website.is_active %}fa-pause{% else %}fa-play{% endif %}"></i>
+                            </button>
+                            
+                            <button class="btn btn-action btn-check" 
+                                    data-website-id="{{ website.id }}"
+                                    data-bs-toggle="tooltip"
+                                    title="Проверить сейчас">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            
+                            <button class="btn btn-action btn-danger btn-delete" 
+                                    data-website-id="{{ website.id }}"
+                                    data-website-name="{{ website.name }}"
+                                    data-bs-toggle="tooltip"
+                                    title="Удалить сайт">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if not websites %}
+<div class="empty-state">
+    <div class="empty-icon">
+        <i class="fas fa-list-alt"></i>
+    </div>
+    <h3>Нет отслеживаемых сайтов</h3>
+    <p class="text-muted">Добавьте первый сайт для начала мониторинга</p>
+    <a href="{{ url_for('add_website') }}" class="btn btn-primary btn-lg">
+        <i class="fas fa-plus-circle me-2"></i>Добавить сайт
+    </a>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<!-- Скрипты удалены, так как они уже есть в script.js -->
+{% endblock %}

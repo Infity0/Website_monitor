@@ -1,0 +1,8 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+requests==2.31.0
+apscheduler==3.10.1
+python-dotenv==1.0.0
+Werkzeug==2.3.7
+pytz==2023.3
+tzlocal==5.0.1

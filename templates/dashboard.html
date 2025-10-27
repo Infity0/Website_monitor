@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Дашборд - SiteMonitor{% endblock %}
+
+{% block page_title %}Обзор мониторинга{% endblock %}
+{% block page_subtitle %}Статус всех отслеживаемых веб-сайтов в реальном времени{% endblock %}
+
+{% block content %}
+<!-- Статистика -->
+<div class="stats-grid mb-4">
+    <div class="stat-card">
+        <div class="stat-icon total">
+            <i class="fas fa-globe"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">{{ website_stats|length }}</div>
+            <div class="stat-label">Всего сайтов</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon online">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">{{ website_stats|selectattr('last_check.is_up')|list|length }}</div>
+            <div class="stat-label">Работают</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon offline">
+            <i class="fas fa-exclamation-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">{{ website_stats|rejectattr('last_check.is_up')|list|length }}</div>
+            <div class="stat-label">Не работают</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon active">
+            <i class="fas fa-play-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-value">{{ website_stats|selectattr('website.is_active')|list|length }}</div>
+            <div class="stat-label">Активный мониторинг</div>
+        </div>
+    </div>
+</div>
+
+<!-- График статистики -->
+<div class="row mb-4">
+    <div class="col-xxl-8 col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-line me-2"></i>Статистика аптайма
+                    </h5>
+                    <div class="chart-controls">
+                        <button class="btn btn-sm btn-outline active" data-period="24h">24ч</button>
+                        <button class="btn btn-sm btn-outline" data-period="7d">7д</button>
+                        <button class="btn btn-sm btn-outline" data-period="30d">30д</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="uptimeChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xxl-4 col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-pie me-2"></i>Общая статистика
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="statusChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Список сайтов -->
+<div class="card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-list me-2"></i>Отслеживаемые сайты
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        {% if website_stats %}
+        <div class="websites-grid p-3">
+            {% for stat in website_stats %}
+            <div class="website-card {% if not stat.website.is_active %}inactive{% endif %}">
+                <div class="website-header">
+                    <div class="website-info">
+                        <div class="website-name">{{ stat.website.name }}</div>
+                        <div class="website-url">{{ stat.website.url }}</div>
+                    </div>
+                    <div class="status-badge {% if stat.website.is_active %}active{% else %}inactive{% endif %}">
+                        {% if stat.website.is_active %}Активен{% else %}Приостановлен{% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    {% if stat.last_check %}
+                    <div class="status-indicator">
+                        <div class="status-main">
+                            <div class="status-bubble {% if stat.last_check.is_up %}online{% else %}offline{% endif %}">
+                                <i class="fas {% if stat.last_check.is_up %}fa-check{% else %}fa-times{% endif %}"></i>
+                            </div>
+                            <div class="status-text">
+                                <span class="status {% if stat.last_check.is_up %}online{% else %}offline{% endif %}">
+                                    {% if stat.last_check.is_up %}ONLINE{% else %}OFFLINE{% endif %}
+                                </span>
+                                <span class="check-time">
+                                    Проверено: {{ stat.last_check.get_local_time().strftime('%H:%M:%S') }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric">
+                            <label>Код ответа</label>
+                            <div class="value {% if stat.last_check.status_code and 200 <= stat.last_check.status_code < 400 %}good{% else %}bad{% endif %}">
+                                {{ stat.last_check.status_code or 'N/A' }}
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <label>Время ответа</label>
+                            <div class="value {% if stat.last_check.response_time and stat.last_check.response_time < 3 %}good{% elif stat.last_check.response_time and stat.last_check.response_time < 5 %}medium{% else %}bad{% endif %}">
+                                {{ "%.2f"|format(stat.last_check.response_time) if stat.last_check.response_time else 'N/A' }}s
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span class="progress-label">Аптайм (24ч)</span>
+                            <span class="progress-percent">{{ stat.uptime_24h }}%</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar {% if stat.uptime_24h > 95 %}bg-success{% elif stat.uptime_24h > 80 %}bg-warning{% else %}bg-danger{% endif %}"
+                                 style="width: {{ stat.uptime_24h }}%">
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-database fa-2x mb-2"></i>
+                        <p>Нет данных о проверках</p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            Проверка каждые {{ stat.website.check_interval }} минут
+                        </small>
+                        <a href="{{ url_for('list_websites') }}" class="btn btn-sm btn-outline">
+                            Подробнее <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="empty-state">
+                <i class="fas fa-cloud fa-3x mb-3"></i>
+                <h3>Нет отслеживаемых сайтов</h3>
+                <p class="text-muted mb-4">Добавьте первый сайт для начала мониторинга</p>
+                <a href="{{ url_for('add_website') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus-circle me-2"></i>Добавить сайт
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize charts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initCharts();
+});
+</script>
+{% endblock %}
